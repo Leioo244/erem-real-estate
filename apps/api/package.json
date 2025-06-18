@@ -1,0 +1,11 @@
+{
+  "name": "erem-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start:dev": "tsx watch apps/api/main.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.12.1"
+  }
+}
