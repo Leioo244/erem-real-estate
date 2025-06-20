@@ -1,1 +1,124 @@
 // Placeholder schema refer to canvas representation
+// Prisma ORM schema – إرم (MVP)
+// يعرّف جداول البيانات الأساسية + المستخدم + المشروع + التقرير
+// Run:  npx prisma migrate dev --name init
+
+// ---------- Datasource & Generator ----------
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------- Core Lookup Tables ----------
+model ConstructionCost {
+  id               Int      @id @default(autoincrement())
+  city             String
+  district         String
+  asset_type       String   // فيلا، شقة، …
+  finish_grade     String   // عظم، عادي، ممتاز، فاخر
+  cost_skeleton_m2 Decimal  // ريال/م²
+  cost_finish_m2   Decimal  // ريال/م² (صفر للعظم)
+  source           String?
+  last_updated     DateTime @default(now())
+
+  @@index([city, district])
+  @@unique([city, district, asset_type, finish_grade])
+}
+
+model LandPrice {
+  id           Int      @id @default(autoincrement())
+  city         String
+  district     String
+  land_price_m2 Decimal
+  source       String?
+  last_updated DateTime @default(now())
+
+  @@unique([city, district])
+}
+
+model FinanceParam {
+  id          Int      @id @default(autoincrement())
+  bank_name   String
+  product     String
+  max_LTV     Float
+  APR         Float?
+  term_years  Int?
+  upfront_fee Float?   // نسبة مئوية
+  source      String?
+  last_updated DateTime @default(now())
+}
+
+model PermitFee {
+  id             Int     @id @default(autoincrement())
+  asset_category String  // سكني، تجاري …
+  fee_pct        Float   // 0.02 مثلًا
+
+  @@unique([asset_category])
+}
+
+model CityIndex {
+  id              Int     @id @default(autoincrement())
+  city            String  @unique
+  index_vs_الرياض Float
+  index_vs_جدة    Float?
+  index_vs_الدمام Float?
+  last_updated    DateTime @default(now())
+}
+
+// ---------- User & Project Data ----------
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String?
+  reports   Report[]
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Project {
+  id             Int       @id @default(autoincrement())
+  user           User      @relation(fields: [userId], references: [id])
+  userId         Int
+  title          String
+  asset_type     String
+  city           String
+  district       String?
+  land_area_m2   Float
+  floor_count    Int?
+  coverage_pct   Float?
+  built_up_m2    Float?
+  finish_grade   String
+  financing_type String   // نقدي أو بنكي
+  bankProductId  Int?
+  ltv_ratio      Float?
+  createdAt      DateTime @default(now())
+  report         Report?
+}
+
+model Report {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int
+  project         Project  @relation(fields: [projectId], references: [id])
+  projectId       Int      @unique
+  pdf_url         String
+  total_cost      Decimal
+  loan_amount     Decimal?
+  monthly_payment Decimal?
+  createdAt       DateTime @default(now())
+}
+
+// ---------- Seed helper enum ----------
+enum AssetType {
+  فيلا_مستقلة
+  فيلا_دوبلكس
+  شقة
+  عمارة_شقق
+  مجمع_تجاري
+  مبنى_مكاتب
+}

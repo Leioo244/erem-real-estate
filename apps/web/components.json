@@ -1,0 +1,12 @@
+{
+    "componentPath": "components/ui",
+    "rsc": false,
+    "typescript": true,
+    "tailwind": {
+      "config": "tailwind.config.js",
+      "css": "app/globals.css",
+      "baseColor": "zinc",
+      "cssVariables": true
+    }
+  }
+  

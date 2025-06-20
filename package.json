@@ -13,7 +13,18 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@types/node": "^24.0.3",
+    "@types/xlsx": "^0.0.36",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
     "prettier": "^3.3.0",
+    "prisma": "6.10.0",
+    "tailwindcss": "^4.1.10",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.4"
+  },
+  "dependencies": {
+    "@prisma/client": "6.10.0",
+    "xlsx": "^0.18.5"
   }
 }
